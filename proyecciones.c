@@ -1,4 +1,4 @@
-#include "SDL.h"
+#include "SDL2/SDL.h"
 #include "math.h"
 #define _USE_MATH_DEFINES
 double pi = M_PI;
@@ -36,14 +36,17 @@ int main (int argc, char* argv[]) {
 		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
 		return 1;
 	}
-	
-	SDL_CreateWindowAndRenderer(640, 480, SDL_WINDOW_RESIZABLE, &window, &renderer);
+
+	SDL_CreateWindowAndRenderer(255, 255, SDL_WINDOW_RESIZABLE, &window, &renderer);
 	
 	int arista = 50;
 	double cubo[arista*12][4];
 
-	int ang = 0;
-	double theta;
+	int ang_x = 0, ang_y = 0;
+	double theta_x, theta_y;
+
+	int pos_x = 115, pos_y = 50;
+	int mov_x =   1, mov_y =   1;
 	
 	double persMat[4][4];
 
@@ -103,32 +106,44 @@ int main (int argc, char* argv[]) {
 		aOri[2][3] = -45;
 		aOri[3][3] = 1;
 
-		deOri[0][0] =   1;
-		deOri[0][3] = 100;
-		deOri[1][1] =   1;
-		deOri[1][3] = 100;
-		deOri[2][2] =   1;
-		deOri[2][3] =  30;
-		deOri[3][3] =   1;
+		deOri[0][0] = 1;
+		deOri[0][3] = pos_x;
+		deOri[1][1] = 1;
+		deOri[1][3] = pos_y;
+		deOri[2][2] = 1;
+		deOri[2][3] = 30;
+		deOri[3][3] = 1;
 
-		theta = (2.0 * pi * ang) / 360.0;
+		if (pos_x >= 230)
+			mov_x = -1;
+		if (pos_x ==  25)
+			mov_x =  1;
+		if (pos_y >= 230)
+			mov_y = -1;
+		if (pos_y ==  25)
+			mov_y =  1;
+		pos_x += mov_x;
+		pos_y += mov_y;
+
+		theta_x = (2.0 * pi * ang_x) / 360.0;
+		theta_y = (2.0 * pi * ang_y) / 360.0;
 
 		rotX[0][0] =  1;
-		rotX[1][1] =  cos(theta);
-		rotX[1][2] = -sin(theta);
-		rotX[2][1] =  sin(theta);
-		rotX[2][2] =  cos(theta);
+		rotX[1][1] =  cos(theta_x);
+		rotX[1][2] = -sin(theta_x);
+		rotX[2][1] =  sin(theta_x);
+		rotX[2][2] =  cos(theta_x);
 		rotX[3][3] =  1;
 
-		rotY[0][0] =  cos(theta);
-		rotY[0][2] =  sin(theta);
+		rotY[0][0] =  cos(theta_y);
+		rotY[0][2] =  sin(theta_y);
 		rotY[1][1] =  1;
-		rotY[2][0] = -sin(theta);
-		rotY[2][2] =  cos(theta);
+		rotY[2][0] = -sin(theta_y);
+		rotY[2][2] =  cos(theta_y);
 		rotY[3][3] =  1;
 
-		ang++;
-		ang %= 360;
+		ang_x += mov_x;
+		ang_y += mov_y;
 
 		multMat(rotX, aOri);
 		multMat(rotY, rotX);
@@ -138,8 +153,7 @@ int main (int argc, char* argv[]) {
 
 		for (int i = 0; i < arista * 12; i++) {
 			rot(persMat, cubo[i]);
-			int light = cubo[i][0] + cubo[i][1] + cubo[i][2];
-			SDL_SetRenderDrawColor(renderer, 0x01 * light, 0x01 * light, 0x01 * light, 0xFF);
+			SDL_SetRenderDrawColor(renderer, cubo[i][0], cubo[i][1], cubo[i][2], 0x88);
 			SDL_RenderDrawPoint(renderer, cubo[i][0], cubo[i][1]);
 		}
 
