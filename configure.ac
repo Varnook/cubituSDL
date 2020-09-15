@@ -1,6 +1,0 @@
-AC_INIT([cubitu], [0.1], [Varnook])
-AM_INIT_AUTOMAKE
-AC_PROG_CC
-PKG_CHECK_MODULES(SDL2, sdl2 >= 2.0)
-AC_CONFIG_FILES([Makefile])
-AC_OUTPUT
